@@ -11,4 +11,4 @@ This is a prototype which means:
 Pull requests and issue discussions are very welcome.
 
 ## Known Issues
- - Over sizes for when capacity is low.
+ - Bloom filter is oversized when configured with a small capacity.
