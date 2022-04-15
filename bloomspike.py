@@ -259,12 +259,12 @@ class BloomSpike():
 
 
 def main():
-    capacity = 10 ** 6
+    capacity = 10 ** 5
     error = 10 ** -5
     config = {"hosts": [("174.22.0.1", 3000), ("174.22.0.2", 3000)]}
     client = aerospike.client(config).connect()
-
-    b = BloomSpike(("test", "test", "test"), capacity, error)
+    b = BloomSpike(("test", "test", "test"), capacity, error,
+                   max_shard_sz=128 * 1024)
 
     b.clear(client)
 
@@ -305,5 +305,9 @@ def main():
 
     b.clear(client)
 
+if __name__ == "__main__":
+    import time
 
-main()
+    now = time.time_ns()
+    main()
+    print("completed in {} ns".format(time.time_ns() - now))
