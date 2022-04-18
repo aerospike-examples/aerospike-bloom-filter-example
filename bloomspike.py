@@ -265,6 +265,8 @@ def main():
     client = aerospike.client(config).connect()
     b = BloomSpike(("test", "test", "test"), capacity, error,
                    max_shard_sz=128 * 1024)
+    nstep = 1000
+    nobjects = 10 ** 5
 
     b.clear(client)
 
@@ -275,18 +277,19 @@ def main():
     assert b.mayContain(client, b"1234")
 
     print(b.__dict__)
+    print(dict(capacity=capacity, error=error, nstep=nstep, nobjects=nobjects))
 
-    for i, v in enumerate(range(capacity)):
-        if i % 1000 == 0:
-            print("inserting", i, "of", capacity)
+    for i, v in enumerate(range(nobjects)):
+        if i % nstep == 0:
+            print("inserting", i, "of", nobjects)
 
         b.add(client, v)
 
     print("checking false negatives")
 
-    for i, v in enumerate(range(capacity)):
-        if i % 1000 == 0:
-            print("checking fn", i, "of", capacity)
+    for i, v in enumerate(range(nobjects)):
+        if i % nstep == 0:
+            print("checking fn", i, "of", nobjects)
 
         assert b.mayContain(client, v)
 
@@ -294,9 +297,9 @@ def main():
 
     false_positives = 0
 
-    for i, v in enumerate(range(capacity, capacity * 3)):
-        if i % 1000 == 0:
-            print("checking fp", i, "of", capacity * 2)
+    for i, v in enumerate(range(nobjects, nobjects * 3)):
+        if i % nstep == 0:
+            print("checking fp", i, "of", nobjects * 2)
 
         if (b.mayContain(client, v)):
             false_positives += 1
