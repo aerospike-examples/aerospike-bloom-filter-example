@@ -259,7 +259,7 @@ class BloomSpike():
 
 
 def main():
-    capacity = 10 ** 5
+    capacity = 10 ** 8
     error = 10 ** -5
     config = {"hosts": [("174.22.0.1", 3000), ("174.22.0.2", 3000)]}
     client = aerospike.client(config).connect()
