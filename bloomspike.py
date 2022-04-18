@@ -360,13 +360,14 @@ def main():
         for i in range(start, end, step):
             yield range(i, i + step if i + step < end else end)
 
-    capacity = 10 ** 5
+    capacity = 10 ** 8
     error = 10 ** -5
     config = {"hosts": [("174.22.0.1", 3000), ("174.22.0.2", 3000)]}
     client = aerospike.client(config).connect()
     b = BloomSpike(("test", "test", "test"), capacity, error,
                    max_shard_sz=128 * 1024)
     nstep = 1000
+    nobjects = 10 ** 5
 
     b.clear(client)
 
@@ -377,23 +378,24 @@ def main():
     assert b.mayContain(client, b"1234")
 
     print(b.__dict__)
+    print(dict(capacity=capacity, error=error, nstep=nstep, nobjects=nobjects))
 
-    for i, v in enumerate(ranges(0, capacity, nstep)):
-        print("inserting", i * nstep, "of", capacity)
+    for i, v in enumerate(ranges(0, nobjects, nstep)):
+        print("inserting", i * nstep, "of", nobjects)
         b.addAll(client, list(v))
 
     print("checking false negatives")
 
-    for i, v in enumerate(ranges(0, capacity, nstep)):
-        print("checking fn", i * nstep, "of", capacity)
+    for i, v in enumerate(ranges(0, nobjects, nstep)):
+        print("checking fn", i * nstep, "of", nobjects)
         assert all(b.mayContainAny(client, list(v)))
 
     print("checking false positives")
 
     false_positives = 0
 
-    for i, v in enumerate(ranges(capacity, capacity * 3, nstep)):
-        print("checking fp", i * nstep, "of", capacity * 2)
+    for i, v in enumerate(ranges(nobjects, nobjects * 3, nstep)):
+        print("checking fp", i * nstep, "of", nobjects * 2)
 
         result = b.mayContainAny(client, list(v))
 
